@@ -11,6 +11,7 @@ def cmd_ls(
     offset: int = 0,
     item_type: Optional[str] = None,
     order: str = "desc",
+    tag: Optional[str] = None,
 ) -> dict:
     """列出摘录
 
@@ -19,6 +20,7 @@ def cmd_ls(
         offset: 偏移量
         item_type: 筛选类型
         order: 排序方向
+        tag: 按标签筛选
 
     Returns:
         列表结果
@@ -38,6 +40,7 @@ def cmd_ls(
         offset=offset,
         item_type=db_type,
         order=order,
+        tag=tag,
     )
 
     return {

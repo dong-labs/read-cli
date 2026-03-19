@@ -19,6 +19,7 @@ def add_item(
     source: Optional[str] = None,
     item_type: str = DEFAULT_TYPE,
     metadata: Optional[str] = None,
+    tags: Optional[str] = None,
 ) -> int:
     """添加摘录，返回新 ID
 
@@ -28,6 +29,7 @@ def add_item(
         source: 来源备注
         item_type: 数据类型
         metadata: JSON 扩展字段
+        tags: 标签（逗号分隔）
 
     Returns:
         新插入记录的 ID
@@ -46,10 +48,10 @@ def add_item(
     with get_cursor() as cursor:
         cursor.execute(
             """
-            INSERT INTO items (content, url, source, type, metadata, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO items (content, url, source, type, metadata, tags, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (content, url, source, item_type, metadata, now, now),
+            (content, url, source, item_type, metadata, tags, now, now),
         )
         return cursor.lastrowid
 
@@ -59,6 +61,7 @@ def list_items(
     offset: int = 0,
     item_type: Optional[str] = None,
     order: str = "desc",
+    tag: Optional[str] = None,
 ) -> list[dict]:
     """列出摘录
 
@@ -67,6 +70,7 @@ def list_items(
         offset: 偏移量
         item_type: 筛选类型
         order: 排序方向（desc/asc）
+        tag: 按标签筛选
 
     Returns:
         摘录列表
@@ -76,27 +80,30 @@ def list_items(
     order_sql = "DESC" if order.lower() == "desc" else "ASC"
 
     with get_cursor() as cursor:
+        conditions = []
+        params = []
+
         if item_type:
-            cursor.execute(
-                f"""
-                SELECT id, content, url, source, type, metadata, created_at, updated_at
-                FROM items
-                WHERE type = ?
-                ORDER BY created_at {order_sql}
-                LIMIT ? OFFSET ?
-                """,
-                (item_type, limit, offset),
-            )
-        else:
-            cursor.execute(
-                f"""
-                SELECT id, content, url, source, type, metadata, created_at, updated_at
-                FROM items
-                ORDER BY created_at {order_sql}
-                LIMIT ? OFFSET ?
-                """,
-                (limit, offset),
-            )
+            conditions.append("type = ?")
+            params.append(item_type)
+
+        if tag:
+            conditions.append("tags LIKE ?")
+            params.append(f"%{tag}%")
+
+        where_clause = " AND ".join(conditions) if conditions else "1=1"
+        params.extend([limit, offset])
+
+        cursor.execute(
+            f"""
+            SELECT id, content, url, source, type, metadata, tags, created_at, updated_at
+            FROM items
+            WHERE {where_clause}
+            ORDER BY created_at {order_sql}
+            LIMIT ? OFFSET ?
+            """,
+            params,
+        )
 
         rows = cursor.fetchall()
         return [dict(row) for row in rows]
@@ -116,7 +123,7 @@ def get_item(item_id: int) -> Optional[dict]:
     with get_cursor() as cursor:
         cursor.execute(
             """
-            SELECT id, content, url, source, type, metadata, created_at, updated_at
+            SELECT id, content, url, source, type, metadata, tags, created_at, updated_at
             FROM items
             WHERE id = ?
             """,
@@ -165,7 +172,7 @@ def search_items(
         if field == "content":
             cursor.execute(
                 """
-                SELECT id, content, url, source, type, metadata, created_at, updated_at
+                SELECT id, content, url, source, type, metadata, tags, created_at, updated_at
                 FROM items
                 WHERE content LIKE ?
                 ORDER BY created_at DESC
@@ -176,7 +183,7 @@ def search_items(
         elif field == "url":
             cursor.execute(
                 """
-                SELECT id, content, url, source, type, metadata, created_at, updated_at
+                SELECT id, content, url, source, type, metadata, tags, created_at, updated_at
                 FROM items
                 WHERE url LIKE ?
                 ORDER BY created_at DESC
@@ -187,7 +194,7 @@ def search_items(
         elif field == "source":
             cursor.execute(
                 """
-                SELECT id, content, url, source, type, metadata, created_at, updated_at
+                SELECT id, content, url, source, type, metadata, tags, created_at, updated_at
                 FROM items
                 WHERE source LIKE ?
                 ORDER BY created_at DESC
@@ -199,7 +206,7 @@ def search_items(
             # 全部字段
             cursor.execute(
                 """
-                SELECT id, content, url, source, type, metadata, created_at, updated_at
+                SELECT id, content, url, source, type, metadata, tags, created_at, updated_at
                 FROM items
                 WHERE content LIKE ? OR url LIKE ? OR source LIKE ?
                 ORDER BY created_at DESC
@@ -220,6 +227,48 @@ def count_total() -> int:
         cursor.execute("SELECT COUNT(*) as count FROM items")
         row = cursor.fetchone()
         return row["count"] if row else 0
+
+
+def count_by_type() -> dict:
+    """按类型统计摘录数量"""
+    from read.db.connection import get_cursor
+
+    with get_cursor() as cursor:
+        cursor.execute("""
+            SELECT type, COUNT(*) as count
+            FROM items
+            GROUP BY type
+            ORDER BY count DESC
+        """)
+        return {row["type"]: row["count"] for row in cursor.fetchall()}
+
+
+def count_by_tag() -> dict:
+    """按标签统计摘录数量"""
+    from read.db.connection import get_cursor
+
+    with get_cursor() as cursor:
+        cursor.execute("SELECT tags FROM items WHERE tags IS NOT NULL AND tags != ''")
+        rows = cursor.fetchall()
+
+        tag_counter = {}
+        for row in rows:
+            tags = row["tags"].split(",") if row["tags"] else []
+            for tag in tags:
+                tag = tag.strip()
+                if tag:
+                    tag_counter[tag] = tag_counter.get(tag, 0) + 1
+
+        return tag_counter
+
+
+def get_stats() -> dict:
+    """获取统计概览"""
+    return {
+        "total": count_total(),
+        "by_type": count_by_type(),
+        "by_tag": count_by_tag(),
+    }
 
 
 def update_item(

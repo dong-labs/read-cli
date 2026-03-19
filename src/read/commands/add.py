@@ -10,6 +10,7 @@ def cmd_add(
     url: Optional[str],
     source: Optional[str],
     item_type: str = "quote",
+    tags: Optional[str] = None,
 ) -> dict:
     """添加摘录
 
@@ -18,6 +19,7 @@ def cmd_add(
         url: 链接
         source: 来源备注
         item_type: 数据类型
+        tags: 标签（逗号分隔）
 
     Returns:
         添加结果
@@ -28,5 +30,6 @@ def cmd_add(
         url=url,
         source=source,
         item_type=item_type,
+        tags=tags,
     )
     return item.to_dict()

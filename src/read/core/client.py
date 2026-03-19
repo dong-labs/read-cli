@@ -22,6 +22,7 @@ from read.db.utils import (
     get_item as db_get_item,
     list_items as db_list_items,
     search_items as db_search_items,
+    get_stats as db_get_stats,
 )
 
 
@@ -56,6 +57,7 @@ class Client:
         source: Optional[str] = None,
         item_type: str = "quote",
         metadata: Optional[str] = None,
+        tags: Optional[str] = None,
     ) -> Item:
         """添加摘录
 
@@ -65,6 +67,7 @@ class Client:
             source: 来源备注
             item_type: 数据类型（quote/article/code）
             metadata: JSON 扩展字段
+            tags: 标签（逗号分隔）
 
         Returns:
             创建的 Item 对象
@@ -78,6 +81,7 @@ class Client:
             source=source,
             item_type=item_type,
             metadata=metadata,
+            tags=tags,
         )
         return self.get(item_id)
 
@@ -87,6 +91,7 @@ class Client:
         offset: int = 0,
         item_type: Optional[str] = None,
         order: str = "desc",
+        tag: Optional[str] = None,
     ) -> list[Item]:
         """列出摘录
 
@@ -95,6 +100,7 @@ class Client:
             offset: 偏移量
             item_type: 筛选类型
             order: 排序方向（desc/asc）
+            tag: 按标签筛选
 
         Returns:
             Item 列表
@@ -104,6 +110,7 @@ class Client:
             offset=offset,
             item_type=item_type,
             order=order,
+            tag=tag,
         )
         return [Item.from_dict(row) for row in rows]
 
@@ -173,6 +180,14 @@ class Client:
             总数
         """
         return db_count_total()
+
+    def stats(self) -> dict:
+        """获取统计概览
+
+        Returns:
+            统计数据
+        """
+        return db_get_stats()
 
     # 链式调用支持（为 Agent 提供更友好的 API）
     def search_query(self, query: str) -> "QueryBuilder":

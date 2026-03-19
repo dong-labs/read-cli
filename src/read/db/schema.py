@@ -6,7 +6,7 @@
 from dong.db import SchemaManager
 from .connection import ReadDatabase
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 
 
 class ReadSchemaManager(SchemaManager):
@@ -32,6 +32,7 @@ class ReadSchemaManager(SchemaManager):
                     source TEXT,
                     type TEXT DEFAULT 'quote',
                     metadata TEXT,
+                    tags TEXT DEFAULT '',
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
                 )
@@ -41,17 +42,21 @@ class ReadSchemaManager(SchemaManager):
         with ReadDatabase.get_cursor() as cur:
             cur.execute("CREATE INDEX IF NOT EXISTS idx_items_type ON items(type)")
             cur.execute("CREATE INDEX IF NOT EXISTS idx_items_created ON items(created_at)")
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_items_tags ON items(tags)")
 
 
 # 兼容性函数
 def get_schema_version() -> str | None:
     return ReadSchemaManager().get_stored_version()
 
+
 def set_schema_version(version: str) -> None:
     ReadDatabase.set_meta(ReadSchemaManager.VERSION_KEY, version)
 
+
 def is_initialized() -> bool:
     return ReadSchemaManager().is_initialized()
+
 
 def init_database() -> None:
     schema = ReadSchemaManager()

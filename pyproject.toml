@@ -1,6 +1,6 @@
 [project]
 name = "dong-read"
-version = "0.3.3"
+version = "0.5.0"
 description = "读咚咚 (Read DongDong) - 个人知识数据层的命令行接口"
 readme = "readme.md"
 requires-python = ">=3.11"
@@ -34,7 +34,7 @@ mcp = [
 ]
 
 [project.scripts]
-dr = "read.cli:app"
+dong-read = "read.cli:app"
 
 [build-system]
 requires = ["hatchling"]

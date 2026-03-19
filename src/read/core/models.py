@@ -20,6 +20,7 @@ class Item:
         source: 来源备注
         type: 数据类型（quote/article/code）
         metadata: JSON 扩展字段
+        tags: 标签（逗号分隔）
         created_at: 创建时间（ISO 8601）
         updated_at: 更新时间（ISO 8601）
     """
@@ -30,6 +31,7 @@ class Item:
     source: Optional[str] = None
     type: str = "quote"
     metadata: Optional[str] = None
+    tags: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
@@ -52,6 +54,13 @@ class Item:
             return self.url
         return "(空)"
 
+    @property
+    def tags_list(self) -> list[str]:
+        """返回标签列表"""
+        if not self.tags:
+            return []
+        return [t.strip() for t in self.tags.split(",") if t.strip()]
+
     def to_dict(self) -> dict:
         """转换为字典"""
         return {
@@ -61,6 +70,7 @@ class Item:
             "source": self.source,
             "type": self.type,
             "metadata": self.metadata,
+            "tags": self.tags,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
@@ -75,6 +85,7 @@ class Item:
             source=data.get("source"),
             type=data.get("type", "quote"),
             metadata=data.get("metadata"),
+            tags=data.get("tags"),
             created_at=data.get("created_at"),
             updated_at=data.get("updated_at"),
         )

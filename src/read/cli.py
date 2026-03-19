@@ -76,10 +76,11 @@ def add(
     url: str = typer.Option(None, "--url", "-u", help="链接"),
     source: str = typer.Option(None, "--source", "-s", help="来源备注"),
     type: str = typer.Option("quote", "--type", "-t", help="数据类型（quote/article/code）"),
+    tags: str = typer.Option(None, "--tags", help="标签（逗号分隔）"),
 ):
     """添加摘录或链接"""
     from read.commands.add import cmd_add
-    result = cmd_add(content=content, url=url, source=source, item_type=type)
+    result = cmd_add(content=content, url=url, source=source, item_type=type, tags=tags)
     return result
 
 
@@ -90,10 +91,11 @@ def ls(
     offset: int = typer.Option(0, "--offset", "-o", help="偏移量"),
     type: str = typer.Option(None, "--type", "-t", help="筛选类型（content/link）"),
     order: str = typer.Option("desc", "--order", help="排序方向（desc/asc）"),
+    tag: str = typer.Option(None, "--tag", help="按标签筛选"),
 ):
     """列出所有摘录"""
     from read.commands.ls import cmd_ls
-    result = cmd_ls(limit=limit, offset=offset, item_type=type, order=order)
+    result = cmd_ls(limit=limit, offset=offset, item_type=type, order=order, tag=tag)
     return result
 
 
@@ -131,6 +133,24 @@ def search(
     """搜索摘录"""
     from read.commands.search import cmd_search
     result = cmd_search(query=query, field=field, limit=limit)
+    return result
+
+
+@app.command()
+@json_output
+def stats():
+    """统计概览"""
+    from read.commands.stats import cmd_stats
+    result = cmd_stats()
+    return result
+
+
+@app.command()
+@json_output
+def tags():
+    """列出所有标签"""
+    from read.commands.tags import cmd_tags
+    result = cmd_tags()
     return result
 
 

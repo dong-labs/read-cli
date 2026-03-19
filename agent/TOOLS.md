@@ -1,96 +1,89 @@
-# TOOLS.md - 读咚咚的工具箱
+# TOOLS.md - 工具箱
 
-## 命令行工具 (CLI)
+我的核心工具是 `dong-read` CLI。
 
-### 安装
+## 安装
+
 ```bash
-pip install dong-read
+pipx install read-cli
 ```
 
-### 基础命令
+## 命令列表
+
+### 初始化
+
 ```bash
-dr init              # 初始化
-dr add "内容"        # 添加摘录
-dr add --url "链接"  # 收藏链接
-dr ls                # 列出所有
-dr search "关键词"   # 搜索
-dr get 1             # 获取单条
-dr delete 1 --force  # 删除
+dong-read init
 ```
 
----
+### 添加摘录
 
-## Python SDK
-
-```python
-from read import Client
-
-client = Client()
-
-# 添加
-client.add("开始，就是最好的时机")
-
-# 搜索
-results = client.search("AI")
-
-# 链式调用
-client.search_query("Python").limit(5).execute()
+```bash
+dong-read add "一句话说得真好"
+dong-read add --url "https://example.com"
+dong-read add "内容" --url "链接" --source "来源"
+dong-read add "AI 相关内容" --tags "AI,技术"
 ```
 
----
+### 列出摘录
 
-## 数据位置
-
+```bash
+dong-read ls                    # 列出所有摘录
+dong-read ls --limit 50         # 指定数量
+dong-read ls --type quote       # 只摘录
+dong-read ls --type link        # 只链接
+dong-read ls --tag "AI"         # 按标签筛选
 ```
-~/.read/read.db
+
+### 搜索摘录
+
+```bash
+dong-read search "关键词"              # 全字段搜索
+dong-read search "关键词" --field content   # 搜索内容
+dong-read search "关键词" --field source    # 搜索来源
 ```
 
-备份：直接复制这个文件
+### 获取详情
+
+```bash
+dong-read get 123                 # 获取单条摘录
+dong-read get 123 --field content # 只获取内容字段
+```
+
+### 删除摘录
+
+```bash
+dong-read delete 123 --force      # 删除单条
+dong-read delete 123 124 125 --force # 批量删除
+```
+
+### 查看标签
+
+```bash
+dong-read tags              # 列出所有标签及数量
+```
+
+### 统计信息
+
+```bash
+dong-read stats             # 统计摘录数量、类型分布、标签分布
+```
+
+## JSON 输出
+
+所有命令支持 JSON 输出，方便 AI 解析：
+
+```bash
+dong-read add "xxx"
+dong-read ls
+dong-read search "关键词"
+dong-read stats
+```
+
+## 数据库
+
+数据存储在 `~/.dong/read.db`
 
 ---
 
-## 摘录类型
-
-| 类型 | 说明 | 示例 |
-|------|------|------|
-| quote | 文字摘录 | 一句话、一段话 |
-| article | 文章链接 | 微信、掘金、博客 |
-| code | 代码片段 | 函数、配置 |
-
----
-
-## 常见来源
-
-| 来源 | 标签 |
-|------|------|
-| CLAUDE.md | 文档 |
-| GitHub | 代码 |
-| 微信 | 聊天 |
-| 掘金 | 文章 |
-| V2EX | 讨论 |
-
----
-
-## 用户意图映射
-
-| 用户说 | 命令 |
-|--------|------|
-| "收藏这句话" | `dr add "..."` |
-| "保存这篇文章" | `dr add --url "..."` |
-| "我存了什么" | `dr ls --limit 10` |
-| "找关于 AI 的" | `dr search "AI"` |
-| "有多少条了" | `dr ls` 查看 total |
-| "删除这条" | `dr delete <id> --force` |
-
----
-
-## 快捷操作
-
-- 记一句话：直接说"收藏：..."
-- 保存链接：说"保存：https://..."
-- 搜索内容：说"找：关键词"
-- 查看数量：说"统计"
-
----
-
-*工具齐备，随时囤书 📖*
+*📚 收集知识，沉淀智慧*

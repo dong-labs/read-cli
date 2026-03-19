@@ -30,7 +30,7 @@
 ### 方式一：从 PyPI 安装（推荐）
 
 ```bash
-pip install dong-read
+pipx install dong-read
 ```
 
 ### 方式二：从源码安装

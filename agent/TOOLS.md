@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-pipx install read-cli
+pipx install dong-read
 ```
 
 ## 命令列表

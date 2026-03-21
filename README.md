@@ -6,7 +6,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-0.1.0-orange.svg)](https://github.com/gudong/read)
+[![Version](https://img.shields.io/badge/Version-0.6.0-orange.svg)](https://github.com/gudong/read)
 
 ---
 
@@ -19,7 +19,7 @@
 ### 核心特点
 
 - **数据层优先** - Core Library 是核心，CLI/插件/SDK 都是客户端
-- **本地私有** - 数据存放在 `~/.read/read.db`，不上云、不同步、不追踪
+- **本地私有** - 数据存放在 `~/.dong/read/read.db`，不上云、不同步、不追踪
 - **Agent 友好** - JSON 输出 + Python SDK + MCP Server
 - **极简核心** - 只做收集，不做整理
 
@@ -44,22 +44,7 @@ pip install -e .
 ### 初始化
 
 ```bash
-dr init
-```
-
----
-
-## 安装 Agent Workspace
-
-如果你使用 OpenClaw，可以把 agent 目录复制到工作区：
-
-```bash
-# 复制 agent workspace
-mkdir -p ~/.openclaw/agents/read
-cp -r agent/* ~/.openclaw/agents/read/
-
-# 从模板创建 MEMORY.md
-cp agent/MEMORY.md.template ~/.openclaw/agents/read/MEMORY.md
+dong-read init
 ```
 
 ---
@@ -68,19 +53,19 @@ cp agent/MEMORY.md.template ~/.openclaw/agents/read/MEMORY.md
 
 ```bash
 # 添加摘录
-dr add "开始，就是最好的时机"
+dong-read add "开始，就是最好的时机"
 
 # 收藏文章
-dr add --url "https://mp.weixin.qq.com/s/xxx"
+dong-read add --url "https://mp.weixin.qq.com/s/xxx"
 
 # 列出所有
-dr ls
+dong-read ls
 
 # 搜索
-dr search "AI"
+dong-read search "AI"
 
 # 删除
-dr delete 123 --force
+dong-read delete 123 --force
 ```
 
 ---
@@ -90,11 +75,6 @@ dr delete 123 --force
 ```
 read/
 ├── src/read/           # CLI 源码
-├── agent/             # Agent workspace（OpenClaw 使用）
-│   ├── IDENTITY.md    # Agent 身份
-│   ├── SOUL.md        # Agent 性格
-│   ├── TOOLS.md       # CLI 工具定义
-│   └── MEMORY.md.template  # 记忆模板
 ├── docs/              # 文档
 ├── tests/             # 测试
 ├── pyproject.toml     # Python 包配置
@@ -126,13 +106,13 @@ results = client.search("AI")
 
 | 命令 | 说明 |
 |------|------|
-| `dr init` | 初始化数据库 |
-| `dr add "内容"` | 添加摘录 |
-| `dr add --url "..."` | 收藏链接 |
-| `dr ls` | 列出所有 |
-| `dr search "关键词"` | 搜索 |
-| `dr get 123` | 获取单条 |
-| `dr delete 123` | 删除 |
+| `dong-read init` | 初始化数据库 |
+| `dong-read add "内容"` | 添加摘录 |
+| `dong-read add --url "..."` | 收藏链接 |
+| `dong-read ls` | 列出所有 |
+| `dong-read search "关键词"` | 搜索 |
+| `dong-read get 123` | 获取单条 |
+| `dong-read delete 123` | 删除 |
 
 ---
 
@@ -143,7 +123,7 @@ results = client.search("AI")
 │                    客户端层                              │
 ├──────────────┬──────────────┬──────────────┬────────────┤
 │ CLI          │ Browser      │ Python SDK   │ MCP Server  │
-│ (dr add)    │ Extension    │ (import)     │ (Agent)     │
+│ (dong-read add)    │ Extension    │ (import)     │ (Agent)     │
 └──────────────┴──────────────┴──────────────┴────────────┘
                              │
                     ┌────────▼────────┐
@@ -153,7 +133,7 @@ results = client.search("AI")
                              │
                     ┌────────▼────────┐
                     │   SQLite DB     │
-                    │   ~/.read/read.db │
+                    │   ~.dong/read/read.db │
                     └─────────────────┘
 ```
 

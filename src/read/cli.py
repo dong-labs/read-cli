@@ -12,7 +12,7 @@ import json
 import sys
 import traceback
 import typer
-from typing import Any
+from typing import Any, List
 
 from dong import json_output, ValidationError, NotFoundError, ConflictError
 from read import __version__
@@ -114,7 +114,7 @@ def get_item(
 @app.command()
 @json_output
 def delete(
-    item_ids: list[int] = typer.Argument(..., help="摘录 ID（支持多个）"),
+    item_ids: List[int] = typer.Argument(..., help="摘录 ID（支持多个）"),
     force: bool = typer.Option(False, "--force", "-f", help="强制删除，不确认"),
 ):
     """删除摘录"""

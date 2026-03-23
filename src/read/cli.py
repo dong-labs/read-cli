@@ -18,7 +18,7 @@ from dong import json_output, ValidationError, NotFoundError, ConflictError
 from read import __version__
 
 app = typer.Typer(
-    name="read",
+    name="dong-read",
     help="读咚咚 (Read) - 个人知识数据层的命令行接口",
     no_args_is_help=True,
     add_completion=False,
@@ -56,7 +56,7 @@ def version_callback(
 ) -> None:
     """版本号回调"""
     if version:
-        typer.echo(f"dr (dong-read) {__version__}")
+        typer.echo(f"dong-read {__version__}")
         raise typer.Exit()
 
 
@@ -86,7 +86,7 @@ def add(
 
 @app.command()
 @json_output
-def ls(
+def list(
     limit: int = typer.Option(20, "--limit", "-l", help="返回数量"),
     offset: int = typer.Option(0, "--offset", "-o", help="偏移量"),
     type: str = typer.Option(None, "--type", "-t", help="筛选类型（content/link）"),

@@ -59,7 +59,7 @@ dong-read add "开始，就是最好的时机"
 dong-read add --url "https://mp.weixin.qq.com/s/xxx"
 
 # 列出所有
-dong-read ls
+dong-read list
 
 # 搜索
 dong-read search "AI"
@@ -109,7 +109,7 @@ results = client.search("AI")
 | `dong-read init` | 初始化数据库 |
 | `dong-read add "内容"` | 添加摘录 |
 | `dong-read add --url "..."` | 收藏链接 |
-| `dong-read ls` | 列出所有 |
+| `dong-read list` | 列出所有 |
 | `dong-read search "关键词"` | 搜索 |
 | `dong-read get 123` | 获取单条 |
 | `dong-read delete 123` | 删除 |
